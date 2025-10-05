@@ -14,10 +14,15 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-*w1g8rlopoeb&#@cfo186
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config(
-    'ALLOWED_HOSTS',
-    default='localhost,127.0.0.1,amritha-heritage-backend.onrender.com,amrithaheritage.com,www.amrithaheritage.com'
-).split(',')
+DEFAULT_ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'amrithaheritage.com',
+    'www.amrithaheritage.com',
+    '.onrender.com',
+]
+ENV_ALLOWED_HOSTS = [h.strip() for h in config('ALLOWED_HOSTS', default='').split(',') if h.strip()]
+ALLOWED_HOSTS = list(dict.fromkeys(DEFAULT_ALLOWED_HOSTS + ENV_ALLOWED_HOSTS))
 
 
 # Application definition
@@ -62,6 +67,18 @@ CORS_ALLOWED_ORIGINS = config(
     default='http://localhost:5173,http://localhost:5174,https://amritha-heritage-admin-dashboard-e1.vercel.app,https://www.amrithaheritage.com'
 ).split(',')
 CORS_ALLOW_CREDENTIALS = True
+
+# CSRF trusted origins (merge env and defaults)
+DEFAULT_CSRF_TRUSTED_ORIGINS = [
+    'https://amrithaheritage.com',
+    'https://www.amrithaheritage.com',
+    'https://amritha-heritage-admin-dashboard-e1.vercel.app',
+    'https://*.onrender.com',
+]
+ENV_CSRF_TRUSTED_ORIGINS = [
+    h.strip() for h in config('CSRF_TRUSTED_ORIGINS', default='').split(',') if h.strip()
+]
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(DEFAULT_CSRF_TRUSTED_ORIGINS + ENV_CSRF_TRUSTED_ORIGINS))
 
 
 
