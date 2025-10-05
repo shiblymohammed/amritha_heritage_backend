@@ -56,7 +56,7 @@ cloudinary.config(
 
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:5173,http://localhost:5174'
+    default='http://localhost:5173,http://localhost:5174,https://amritha-heritage-admin-dashboard-e1.vercel.app,https://www.amrithaheritage.com'
 ).split(',')
 CORS_ALLOW_CREDENTIALS = True
 
