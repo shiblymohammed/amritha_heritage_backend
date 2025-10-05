@@ -95,17 +95,29 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# Production database configuration (PostgreSQL for Render)
 import dj_database_url
-if 'DATABASE_URL' in os.environ:
-    DATABASES['default'] = dj_database_url.parse(os.environ.get('DATABASE_URL'))
+
+# PostgreSQL configuration with internal/external URL support
+def get_database_config():
+    # Try internal URL first (faster within Render network)
+    internal_url = config('DATABASE_INTERNAL_URL', default=None)
+    if internal_url:
+        return dj_database_url.parse(internal_url, conn_max_age=600)
+    
+    # Fallback to external URL
+    external_url = config('DATABASE_URL', default=None)
+    if external_url:
+        return dj_database_url.parse(external_url, conn_max_age=600)
+    
+    # Local development fallback
+    return dj_database_url.parse('sqlite:///' + str(BASE_DIR / 'db.sqlite3'))
+
+DATABASES = {
+    'default': get_database_config()
+}
 
 
 
