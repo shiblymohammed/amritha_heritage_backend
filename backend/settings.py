@@ -62,11 +62,48 @@ cloudinary.config(
 )
 
 
-CORS_ALLOWED_ORIGINS = config(
-    'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:5173,http://localhost:5174,https://amritha-heritage-admin-dashboard-e1.vercel.app,https://www.amrithaheritage.com'
-).split(',')
+# CORS Configuration
+DEFAULT_CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:5174', 
+    'http://localhost:5175',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
+    'http://127.0.0.1:5175',
+    'https://amritha-heritage-admin-dashboard-e1.vercel.app',
+    'https://www.amrithaheritage.com',
+    'https://amrithaheritage.com',
+]
+
+ENV_CORS_ALLOWED_ORIGINS = [
+    h.strip() for h in config('CORS_ALLOWED_ORIGINS', default='').split(',') if h.strip()
+]
+
+CORS_ALLOWED_ORIGINS = list(dict.fromkeys(DEFAULT_CORS_ALLOWED_ORIGINS + ENV_CORS_ALLOWED_ORIGINS))
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = False
+
+# Additional CORS settings for better compatibility
+CORS_ALLOWED_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 
 # CSRF trusted origins (merge env and defaults)
 DEFAULT_CSRF_TRUSTED_ORIGINS = [
