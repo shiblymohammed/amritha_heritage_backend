@@ -62,11 +62,19 @@ def make_reservation_api(request):
 
     try:
         data = json.loads(request.body)
+        print(f"Received data: {data}")  # Debug log
         
-        # Extract data
-        reservation = data.get('reservation', {})
-        items = data.get('items', [])
-        total_amount = data.get('totalAmount', 0)
+        # Handle both formats - direct data or nested reservation
+        if 'reservation' in data:
+            # Old format with nested reservation
+            reservation = data.get('reservation', {})
+            items = data.get('items', [])
+            total_amount = data.get('totalAmount', 0)
+        else:
+            # New format with direct data
+            reservation = data
+            items = []
+            total_amount = 0
 
         # --- Send Email Notification ---
         subject = f"New Table Reservation: {reservation.get('name')} on {reservation.get('date')}"
@@ -93,4 +101,6 @@ def make_reservation_api(request):
     except Exception as e:
         # Log the error for debugging
         print(f"Error in make_reservation_api: {e}")
+        import traceback
+        traceback.print_exc()  # Print full traceback
         return JsonResponse({'error': 'Failed to process reservation.'}, status=500)
