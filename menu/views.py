@@ -1,12 +1,20 @@
 from django.shortcuts import render
-
-# Create your views here.
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from .models import DailySpecial
 from .serializers import DailySpecialSerializer, DailySpecialCreateSerializer
+
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+
+
+
 
 class DailySpecialViewSet(viewsets.ModelViewSet):
     queryset = DailySpecial.objects.all()
@@ -39,3 +47,50 @@ class DailySpecialViewSet(viewsets.ModelViewSet):
             'message': f"Daily special {'activated' if special.is_active else 'deactivated'} successfully",
             'data': serializer.data
         })
+
+
+
+
+
+#emaill sending logic
+
+
+@csrf_exempt # Important for APIs called from a separate frontend
+def make_reservation_api(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        
+        # Extract data
+        reservation = data.get('reservation', {})
+        items = data.get('items', [])
+        total_amount = data.get('totalAmount', 0)
+
+        # --- Send Email Notification ---
+        subject = f"New Table Reservation: {reservation.get('name')} on {reservation.get('date')}"
+        
+        # You can use a simple text message or an HTML template
+        html_message = render_to_string('new_reservation.html', {
+            'reservation': reservation,
+            'items': items,
+            'total_amount': total_amount,
+        })
+        plain_message = f"New reservation from {reservation.get('name')}. Please check the admin dashboard."
+
+        send_mail(
+            subject=subject,
+            message=plain_message, # Fallback for email clients that don't support HTML
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=['shibilymohammed75@gmail.com'], # Your admin email
+            html_message=html_message,
+            fail_silently=False,  # Now that email is working, we can catch errors
+        )
+
+        return JsonResponse({'message': 'Reservation successful and notification sent.'}, status=200)
+
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Error in make_reservation_api: {e}")
+        return JsonResponse({'error': 'Failed to process reservation.'}, status=500)

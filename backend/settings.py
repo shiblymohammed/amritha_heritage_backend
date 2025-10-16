@@ -62,6 +62,30 @@ cloudinary.config(
 )
 
 
+
+
+
+
+
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Or your email provider's SMTP server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+# Use config() instead of os.getenv() for consistency
+EMAIL_HOST_USER = config('EMAIL_USER_ADDRESS')
+EMAIL_HOST_PASSWORD = config('EMAIL_APP_PASSWORD')
+
+# Default from email
+DEFAULT_FROM_EMAIL = f"Amritha Heritage Reservations <{config('EMAIL_USER_ADDRESS')}>"
+
+
+
+
+
+
+
 # CORS Configuration
 DEFAULT_CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
@@ -135,7 +159,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
