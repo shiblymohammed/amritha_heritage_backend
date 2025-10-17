@@ -184,4 +184,4 @@ def make_reservation_api(request):
         print(f"Error in make_reservation_api: {e}")
         import traceback
         traceback.print_exc()  # Print full traceback
-        return JsonResponse({'error': 'Failed to process reservation.'}, status=500)
+        return JsonResponse({'error': 'Failed to process reservation.', 'detail': str(e)}, status=500)
