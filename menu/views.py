@@ -161,16 +161,23 @@ def make_reservation_api(request):
         })
         plain_message = f"New reservation from {reservation.get('name')}. Please check the admin dashboard."
 
-        send_mail(
-            subject=subject,
-            message=plain_message, # Fallback for email clients that don't support HTML
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=['shibilymohammed75@gmail.com'], # Your admin email
-            html_message=html_message,
-            fail_silently=False,  # Now that email is working, we can catch errors
-        )
-
-        return JsonResponse({'message': 'Reservation successful and notification sent.'}, status=200)
+        # Attempt to send, but do not fail the whole request if email fails
+        try:
+            send_mail(
+                subject=subject,
+                message=plain_message,  # Fallback for email clients that don't support HTML
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=['shibilymohammed75@gmail.com'],  # Your admin email
+                html_message=html_message,
+                fail_silently=False,
+            )
+            return JsonResponse({'message': 'Reservation successful and notification sent.', 'email_sent': True}, status=200)
+        except Exception as email_err:
+            # Log error, but still succeed the reservation to avoid 5xx
+            print(f"Email send failed: {email_err}")
+            import traceback
+            traceback.print_exc()
+            return JsonResponse({'message': 'Reservation successful, but email failed to send.', 'email_sent': False}, status=200)
 
     except Exception as e:
         # Log the error for debugging
