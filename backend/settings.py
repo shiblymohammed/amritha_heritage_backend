@@ -68,17 +68,20 @@ cloudinary.config(
 
 
 
-# Email Configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Or your email provider's SMTP server
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-# Use config() instead of os.getenv() for consistency
+# Email Configuration (parameterized via environment)
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
+EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=20, cast=int)
+
+# Credentials
 EMAIL_HOST_USER = config('EMAIL_USER_ADDRESS')
 EMAIL_HOST_PASSWORD = config('EMAIL_APP_PASSWORD')
 
 # Default from email
-DEFAULT_FROM_EMAIL = f"Amritha Heritage Reservations <{config('EMAIL_USER_ADDRESS')}>"
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=f"Amritha Heritage Reservations <{config('EMAIL_USER_ADDRESS')}>")
 
 
 

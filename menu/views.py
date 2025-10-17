@@ -48,6 +48,25 @@ class DailySpecialViewSet(viewsets.ModelViewSet):
             'data': serializer.data
         })
 
+@csrf_exempt
+def test_email_api(request):
+    """Send a simple test email and report success or error."""
+    try:
+        subject = "Test email from Amritha Heritage backend"
+        plain_message = "This is a test email from the production backend."
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[settings.EMAIL_HOST_USER],
+            fail_silently=False,
+        )
+        return JsonResponse({'ok': True, 'message': 'Email sent successfully.'}, status=200)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
 
 
 
