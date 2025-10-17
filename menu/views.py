@@ -78,6 +78,38 @@ def test_api(request):
             'method': request.method
         })
 
+@csrf_exempt
+def make_reservation_api_no_email(request):
+    """Test version without email sending"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        print(f"Received data (no email): {data}")  # Debug log
+        
+        # Handle both formats - direct data or nested reservation
+        if 'reservation' in data:
+            # Old format with nested reservation
+            reservation = data.get('reservation', {})
+            items = data.get('items', [])
+            total_amount = data.get('totalAmount', 0)
+        else:
+            # New format with direct data
+            reservation = data
+            items = []
+            total_amount = 0
+
+        # Skip email sending for testing
+        return JsonResponse({'message': 'Reservation successful (no email sent for testing).'}, status=200)
+
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Error in make_reservation_api_no_email: {e}")
+        import traceback
+        traceback.print_exc()  # Print full traceback
+        return JsonResponse({'error': 'Failed to process reservation.'}, status=500)
+
 @csrf_exempt # Important for APIs called from a separate frontend
 def make_reservation_api(request):
     if request.method != 'POST':
