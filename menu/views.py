@@ -55,6 +55,29 @@ class DailySpecialViewSet(viewsets.ModelViewSet):
 #emaill sending logic
 
 
+@csrf_exempt
+def test_api(request):
+    """Simple test endpoint to check if API is working"""
+    if request.method == 'GET':
+        return JsonResponse({
+            'status': 'success',
+            'message': 'API is working',
+            'method': 'GET'
+        })
+    elif request.method == 'POST':
+        return JsonResponse({
+            'status': 'success', 
+            'message': 'API is working',
+            'method': 'POST',
+            'data_received': request.body.decode('utf-8') if request.body else 'No data'
+        })
+    else:
+        return JsonResponse({
+            'status': 'success',
+            'message': 'API is working',
+            'method': request.method
+        })
+
 @csrf_exempt # Important for APIs called from a separate frontend
 def make_reservation_api(request):
     if request.method != 'POST':
